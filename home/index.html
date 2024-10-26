@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enhanced Navbar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="donate_button.css">
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-analytics.js"></script>
+    <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        referrerpolicy="no-referrer" rel="stylesheet" />
+    <link rel="stylesheet" href="/home/main.css">
+    <link rel="stylesheet" href="/chatbot/chatbot_styles.css">
+    <style>
+      
+/* Scroll Button Styles */
+.scroll-to-top, .scroll-to-bottom {
+    position: fixed;
+    right: 30px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    z-index: 1000;
+}
+
+.scroll-to-top {
+    bottom: 90px; /* Position slightly above the bottom button */
+}
+
+.scroll-to-bottom {
+    bottom: 30px;
+}
+
+/* Icon inside the button */
+.scroll-to-top i, .scroll-to-bottom i {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.scroll-to-top.show, .scroll-to-bottom.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top.show i, .scroll-to-bottom.show i {
+    animation: bounce 2s infinite;
+}
+
+.info-section {
+            padding: 60px 0;
+            background-color: #f9f9f9;
+            perspective: 1000px; /* Create 3D perspective */
+        }
+        .info-section .heading {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .info-section .card {
+            border: none;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            transform-style: preserve-3d; /* Enable 3D transformation */
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            box-shadow: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+            border-radius: 15px;
+        }
+        .info-section .card:hover {
+            transform: rotateY(15deg) rotateX(5deg) scale(1.05); /* Rotate and scale on hover */
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.15), -10px -10px 30px rgba(255, 255, 255, 0.8);
+        }
+        .card-body i {
+            font-size: 2.5em;
+            color: #007bff;
+            margin-bottom: 15px;
+            transition: color 0.5s ease;
+        }
+        .card-body i:hover {
+            color: #0056b3; /* Icon color change on hover */
+        }
+        .card-title {
+            font-weight: 600;
+            font-size: 1.25em;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="/images/refoodify-logo-removebg-preview.png" width="70px" height="70px" alt="Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/home/index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/home/index.html#impact">Impact</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/mongodb contact/templates/contact.html">Contact Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/chatbot/chatbot.html">ChatBot</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/firebase login/auth-implemented/register.html">Get Started</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="carouselExampleCaptions" class="carousel slide">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="/images/image (5)-min.jpg" class="d-block w-100 image" alt="...">
+            <div class="carousel-caption d-none d-md-block">
+              <h3>Reduce Food Waste, Feed Communities</h3>
+              <!-- <p class="paragraph">Help redistribute excess food by connecting with local retailers and restaurants, or reduce waste by donating or composting.</p> -->
+              <button  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#donateFoodModal">Donate Now !</button>
+              <button class="btn btn-secondary" onclick="window.location.href='/firebase login/auth-implemented/register.html'">Get Started</button>
+              
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <h1 class="heading_h1">Our Services</h1>
+      <div class="container mt-5">
+        <div class="d-flex justify-content-around flex-wrap">
+          <div class="card" style="width: 18rem;">
+            <img src="/images/WhatsApp Image 2024-10-25 at 13.16.37.jpeg" class="card-img-top" alt="Food Image" height="200px">
+            <div class="card-body">
+              <h5 class="card-title">Find Access Food</h5>
+              <p class="card-text">Browse listings from local businesses.</p>
+              <button onclick="fetchDonationsAndRedirect()" class="btn btn-primary">Get Food Available</button>
+            </div>
+          </div>
+          
+          <div class="card" style="width: 18rem;">
+            <img src="/images/224.jpg" class="card-img-top" alt="Food Image" height="200px">
+            <div class="card-body">
+              <h5 class="card-title">Claim & Collect</h5>
+              <p class="card-text">Reserve your food and pick it up.</p>
+              <a href="/home/claim_collect.html" class="btn btn-primary">Let's Go</a>
+            </div>
+          </div>
+          
+          <div class="card" style="width: 18rem;">
+            <img src="/images/7064557.jpg" class="card-img-top" alt="Food Image" height="200px">
+            <div class="card-body">
+              <h5 class="card-title">Contribute or Compost</h5>
+              <p class="card-text">Browse listings from local businesses.</p>
+              <a href="/home/contribute_compost.html" class="btn btn-primary">Get Access</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- Section: Our Work with Waste Food -->
+<div class="info-section text-center">
+  <h2 class="heading">What We Do with Waste Food</h2>
+  <div class="container">
+      <div class="row">
+          <!-- Collection -->
+          <div class="col-md-4 mb-4">
+              <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                      <i class="fas fa-truck"></i>
+                      <h5 class="card-title">Collection</h5>
+                      <p class="card-text">We gather surplus food from restaurants, hotels, and events to prevent waste.</p>
+                  </div>
+              </div>
+          </div>
+          <!-- Sorting & Quality Check -->
+          <div class="col-md-4 mb-4">
+              <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                      <i class="fas fa-check-circle"></i>
+                      <h5 class="card-title">Sorting & Quality Check</h5>
+                      <p class="card-text">Food is sorted and checked for safety, ensuring it meets quality standards.</p>
+                  </div>
+              </div>
+          </div>
+          <!-- Donation to NGOs -->
+          <div class="col-md-4 mb-4">
+              <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                      <i class="fas fa-hand-holding-heart"></i>
+                      <h5 class="card-title">Donation to NGOs</h5>
+                      <p class="card-text">Edible food is distributed to NGOs, feeding the underprivileged in our community.</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="row">
+          <!-- Composting -->
+          <div class="col-md-6 mb-4">
+              <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                      <i class="fas fa-recycle"></i>
+                      <h5 class="card-title">Composting</h5>
+                      <p class="card-text">Inedible waste is converted into compost, supporting sustainable farming practices.</p>
+                  </div>
+              </div>
+          </div>
+          <!-- Community Awareness -->
+          <div class="col-md-6 mb-4">
+              <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                      <i class="fas fa-bullhorn"></i>
+                      <h5 class="card-title">Community Awareness</h5>
+                      <p class="card-text">We promote food waste reduction and educate the public on sustainable practices.</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+      <h1 class="heading2" id="impact">Making a Real Difference</h1>
+    <!-- Track Your Impact Section with 3D Animation -->
+<div class="impact-section py-5 text-center bg-light">
+  <div class="container">
+      <h2 class="mb-4"> Our Impact</h2>
+      <p class="lead mb-5">See the difference 'rewe making in reducing food waste and helping those in need!</p>
+      
+      <div class="row">
+          <!-- Total Kilograms Saved -->
+          <div class="col-md-3 mb-4">
+              <div class="impact-card shadow-sm">
+                  <div class="impact-card-body">
+                      <h3 class="impact-title text-success">250 kg</h3>
+                      <p class="impact-text">Total Food Saved</p>
+                  </div>
+              </div>
+          </div>
+          <!-- Meals Donated -->
+          <div class="col-md-3 mb-4">
+              <div class="impact-card shadow-sm">
+                  <div class="impact-card-body">
+                      <h3 class="impact-title text-primary">600</h3>
+                      <p class="impact-text">Meals Donated</p>
+                  </div>
+              </div>
+          </div>
+          <!-- Carbon Footprint Reduced -->
+          <div class="col-md-3 mb-4">
+              <div class="impact-card shadow-sm">
+                  <div class="impact-card-body">
+                      <h3 class="impact-title text-info">120 kg CO₂</h3>
+                      <p class="impact-text">Carbon Footprint Reduced</p>
+                  </div>
+              </div>
+          </div>
+          <!-- Compost Produced -->
+          <div class="col-md-3 mb-4">
+              <div class="impact-card shadow-sm">
+                  <div class="impact-card-body">
+                      <h3 class="impact-title text-warning">75 kg</h3>
+                      <p class="impact-text">Compost Created</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+      <div class="mt-5">
+          <h5>Help us make an even bigger impact!</h5>
+              <button  class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#donateFoodModal">Donate Now !</button>
+              <!-- <a href="" class="btn btn-outline-primary mt-2" >Donate More Food</a> -->
+      </div>
+  </div>
+</div>
+      <div class="container mt-5">
+        <h2 class="text-center mb-4 heading_h1">Why Choose Us?</h2>
+        <div class="row justify-content-center">
+          <div class="col-md-3">
+            <div class="feature-card">
+              <i class="fas fa-clock feature-icon"></i>
+              <div class="feature-title">Real-Time Listings</div>
+              <p>See available food in real-time.</p>
+            </div>
+          </div>
+  
+          <div class="col-md-3">
+            <div class="feature-card">
+              <i class="fas fa-map-marker-alt feature-icon"></i>
+              <div class="feature-title">Geolocation Matching</div>
+              <p>Find food nearby easily.</p>
+            </div>
+          </div>
+  
+          <div class="col-md-3">
+            <div class="feature-card">
+              <i class="fas fa-seedling feature-icon"></i>
+              <div class="feature-title">Composting Integration</div>
+              <p>Ensure food that can't be used goes to compost, not landfill.</p>
+            </div>
+          </div>
+  
+          <div class="col-md-3">
+            <div class="feature-card">
+              <i class="fas fa-gift feature-icon"></i>
+              <div class="feature-title">Incentives & Rewards</div>
+              <p>Earn rewards for saving food.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+     <h1 class="heading3">Our Partners</h1>
+     <div class="container mt-5">
+      <h2 class="ngo-heading">NGOs Making a Difference</h2>
+  
+      <div class="row">
+          <!-- Akshaya Patra Foundation Review -->
+          <div class="col-md-4 d-flex">
+              <div class="ngo-review w-100">
+                  <img src="/images/Akshaya Patra Foundation.jpg" class="ngo-image" alt="Akshaya Patra Foundation">
+                  <div class="ngo-info">
+                      <h5>Akshaya Patra Foundation</h5>
+                      <p>Offers fresh meals to children in government and government-aided schools through its Mid-Day Meal Scheme.</p>
+                      <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                  </div>
+              </div>
+          </div>
+  
+          <!-- Rise Against Hunger India Review -->
+          <div class="col-md-4 d-flex">
+              <div class="ngo-review w-100">
+                  <img src="/images/Rise Against Hunger India.jpg" class="ngo-image" alt="Rise Against Hunger India">
+                  <div class="ngo-info">
+                      <h5>Rise Against Hunger India</h5>
+                      <p>Provides meals in schools, hospitals, and clinics.</p>
+                      <div class="ngo-review-stars">⭐⭐⭐⭐</div>
+                  </div>
+              </div>
+          </div>
+  
+          <!-- Cuddles Foundation Review -->
+          <div class="col-md-4 d-flex">
+              <div class="ngo-review w-100">
+                  <img src="/images/Cuddles Foundation.jpg" class="ngo-image" alt="Cuddles Foundation">
+                  <div class="ngo-info">
+                      <h5>Cuddles Foundation</h5>
+                      <p>Provides food and nutrition to children with cancer, along with counseling and support for caregivers.</p>
+                      <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                  </div>
+              </div>
+          </div>
+  
+          <!-- Leher, New Delhi Review -->
+          <div class="col-md-4 d-flex">
+              <div class="ngo-review w-100">
+                  <img src="/images/Leher.jpg" class="ngo-image" alt="Leher, New Delhi">
+                  <div class="ngo-info">
+                      <h5>Leher, New Delhi</h5>
+                      <p>Helps underprivileged children with food, education, and sustainable living.</p>
+                      <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                  </div>
+              </div>
+          </div>
+  
+          <!-- Feeding India Review -->
+          <div class="col-md-4 d-flex">
+              <div class="ngo-review w-100">
+                  <img src="/images/Feeding India.jpg" class="ngo-image" alt="Feeding India">
+                  <div class="ngo-info">
+                      <h5>Feeding India</h5>
+                      <p>Provides essential food support, including raw grains and freshly cooked meals, to underserved communities.</p>
+                      <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="container mt-5">
+    <h2 class="ngo-heading">Restaurant or Organisation</h2>
+
+    <div class="row">
+        <!-- Akshaya Patra Foundation Review -->
+        <div class="col-md-4 d-flex">
+            <div class="ngo-review w-100">
+                <img src="/images/Chokhi Dhani.jpg" class="ngo-image" alt="Chokhi Dhani">
+                <div class="ngo-info">
+                    <h5>Chokhi Dhani</h5>
+                    <p>A popular Rajasthani-themed resort with large buffets, often leading to surplus food.</p>
+                    <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rise Against Hunger India Review -->
+        <div class="col-md-4 d-flex">
+            <div class="ngo-review w-100">
+                <img src="/images/Barbeque Nation.jpg" class="ngo-image" alt="Barbeque Nation">
+                <div class="ngo-info">
+                    <h5>Barbeque Nation</h5>
+                    <p>Known for its buffet-style dining, resulting in frequent leftover food.</p>
+                    <div class="ngo-review-stars">⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cuddles Foundation Review -->
+        <div class="col-md-4 d-flex">
+            <div class="ngo-review w-100">
+                <img src="/images/Radisson Blu Jaipur.jpg" class="ngo-image" alt="Radisson Blu Jaipur">
+                <div class="ngo-info">
+                    <h5>Radisson Blu Jaipur </h5>
+                    <p>A luxury hotel with regular events and banquets producing excess food.</p>
+                    <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leher, New Delhi Review -->
+        <div class="col-md-4 d-flex">
+            <div class="ngo-review w-100">
+                <img src="/images/The Lalit Jaipur.jpg" class="ngo-image" alt="The Lalit Jaipur">
+                <div class="ngo-info">
+                    <h5>The Lalit Jaipur</h5>
+                    <p>Hosts numerous gatherings, creating potential for food redistribution.</p>
+                    <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feeding India Review -->
+        <div class="col-md-4 d-flex">
+            <div class="ngo-review w-100">
+                <img src="/images/Hotel Clarks Amer.jpg" class="ngo-image" alt="Hotel Clarks Amer">
+                <div class="ngo-info">
+                    <h5>Hotel Clarks Amer</h5>
+                    <p>A top venue for events and weddings with significant food waste.</p>
+                    <div class="ngo-review-stars">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <!-- Modal Structure -->
+    <div class="modal fade" id="donateFoodModal" tabindex="-1" aria-labelledby="donateFoodModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="donateFoodModalLabel">Donate Food</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="donationForm">
+                      <div class="form-group">
+                          <input type="text" id="name" class="form-control" placeholder="Your Name" required />
+                      </div>
+                      <div class="form-group">
+                          <input type="text" id="restaurantName" class="form-control" placeholder="Organisation Name(Optional)"  />
+                      </div>
+                      <div class="form-group">
+                          <input type="tel" id="contactNumber" class="form-control" placeholder="Contact Number" required />
+                      </div>
+                      <div class="form-group">
+                          <input type="email" id="email" class="form-control" placeholder="Email" required />
+                      </div>
+                      <div class="form-group">
+                          <select id="foodQuality" class="form-control" required>
+                              <option value="">Food Quality</option>
+                              <option value="Good">Good</option>
+                              <option value="Medium">Medium</option>
+                              <option value="Compost">Compost</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                        <select id="foodType" class="form-control" required>
+                            <option value="">Food Type</option>
+                            <option value="Veg">Veg</option>
+                            <option value="Non-Veg">Non-Veg</option>
+                            
+                        </select>
+                    </div>
+                      <div class="form-group">
+                          <input type="number" id="foodQuantity" class="form-control" placeholder="Food Quantity (kg)" min="15" required />
+                      </div>
+                      <div class="form-group">
+                          <input type="file" id="imageUpload" class="form-control" accept="image/*" required />
+                      </div>
+                      <div class="form-group">
+                          <div id="locationField" class="d-flex mt-2">
+                              <input type="text" id="address" class="form-control" placeholder="Type your address" required />
+                              <button type="button" class="btn btn-primary ms-2" onclick="getCurrentLocation()">Use Location</button>
+                          </div>
+                      </div>
+                      <button type="submit" class="btn btn-success w-100 mt-3">Donate</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+
+<!-- Scroll to Top Button -->
+<div id="scrollToTop" class="scroll-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+
+<!-- Scroll to Bottom Button -->
+<div id="scrollToBottom" class="scroll-to-bottom">
+  <i class="fa fa-arrow-down"></i>
+</div>
+
+
+  <footer class="bg-dark text-white py-5 mt-5">
+    <div class="container">
+      <div class="row">
+        <!-- About Section -->
+        <div class="col-md-4 mb-4">
+          <h5>About Us</h5>
+          <p>Our mission is to reduce food waste by connecting surplus food with those who need it. Join us in our journey to make the world more sustainable.</p>
+        </div>
+  
+        <!-- Quick Links Section -->
+        <div class="col-md-4 mb-4">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="/home/index.html" class="text-white footer-link">Home</a></li>
+            <li><a href="/home/index.html#impact" class="text-white footer-link">Our Impact</a></li>
+            <li><a href="/mongodb contact/templates/contact.html" class="text-white footer-link">Contact Us</a></li>
+            <li><a href="/firebase login/auth-implemented/index.html" class="text-white footer-link">Get Started</a></li>
+          </ul>
+        </div>
+  
+        <!-- Contact Section with Social Icons -->
+        <div class="col-md-4 mb-4">
+          <h5>Contact Us</h5>
+          <p>Email: foodwastemanagement2674@gmail.com</p>
+          <p>Phone: +9156464524458</p>
+  
+          <h5>Follow Us</h5>
+          <div>
+            <a href="https://www.facebook.com/profile.php?id=61567259982977" class="text-white me-3 footer-link" target="_blank"><i class="fab fa-facebook-f fa-lg"></i></a>
+            <a href="https://twitter.com" class="text-white me-3 footer-link" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
+            <a href="https://www.instagram.com/refoodify_2674/?hl=en" class="text-white footer-link" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center py-3 bg-secondary">
+      <p class="mb-0">&copy; 2024 Food Waste Management. All Rights Reserved.</p>
+    </div>
+  </footer>
+  
+<!-- <script src="/chatbot.js"></script> -->
+<script src="/home/data_script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/chatbot/chatbot.js"></script>
+  <!-- Firebase and Scripts -->
+<script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-firestore.js"></script>
+  <script src="/donate button/index.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN6jIeHz" crossorigin="anonymous"></script>
+  
+  </body>
+</html>
