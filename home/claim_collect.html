@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collect & Rewards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="claim_collect.css">
+</head>
+<body>
+    <div class="container text-center py-5">
+        <h1 class="animate__animated animate__fadeInDown">Collect & Rewards</h1>
+        <p>Arrange vehicle pick-ups and earn rewards through your contributions.</p>
+
+        <div class="row mt-5">
+            <!-- Collection Section -->
+            <div class="col-md-6">
+                <div class="info-card shadow-sm animate__animated animate__zoomIn" data-bs-toggle="modal" data-bs-target="#arrangeModal">
+                    <div class="info-card-icon">
+                        <i class="fas fa-truck fa-3x text-primary"></i>
+                    </div>
+                    <div class="info-card-body">
+                        <h4>Arrange Collection</h4>
+                        <p>Arrange for vehicle pick-up to distribute large quantities or assist with logistics.</p>
+                        <button class="btn btn-primary">Arrange Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rewards Section -->
+            <div class="col-md-6">
+                <div class="reward-card shadow-sm animate__animated animate__zoomIn" data-bs-toggle="modal" data-bs-target="#redeemModal">
+                    <div class="reward-content">
+                        <i class="fas fa-award fa-3x mb-3 text-warning"></i>
+                        <h2 class="reward-title">150 Points</h2>
+                        <p>Earned through successful contributions and collections.</p>
+                        <button class="btn btn-warning">Redeem Points</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrange Collection Modal -->
+    <div class="modal fade" id="arrangeModal" tabindex="-1" aria-labelledby="arrangeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="arrangeModalLabel">Arrange Collection</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="arrangeForm">
+                        <div class="mb-3">
+                            <label for="pickupDate" class="form-label">Preferred Date & Time</label>
+                            <input type="datetime-local" id="pickupDate" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Pick-up Location</label>
+                            <input type="text" id="location" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Confirm Arrangement</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redeem Points Modal -->
+    <div class="modal fade" id="redeemModal" tabindex="-1" aria-labelledby="redeemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="redeemModalLabel">Redeem Your Points</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="redeemForm">
+                        <p class="lead">You have 150 points</p>
+                        <select id="rewardOption" class="form-select" required>
+                            <option value="" disabled selected>Select Reward</option>
+                            <option value="discount_coupon">Discount Coupon</option>
+                            <option value="gift_card">Gift Card</option>
+                            <option value="donation_match">Donate Points to Food Cause</option>
+                        </select>
+                        <button type="submit" class="btn btn-warning w-100 mt-3">Redeem Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
+    <script>
+       import { auth, firestore, storage } from './firebase_config.js';
+
+
+        // Handle Collection Arrangement
+        document.getElementById('arrangeForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const pickupDate = document.getElementById('pickupDate').value;
+            const location = document.getElementById('location').value;
+            const user = auth.currentUser;
+
+            if (user) {
+                try {
+                    await db.collection('collections').add({
+                        userId: user.uid,
+                        pickupDate: pickupDate,
+                        location: location,
+                        status: 'Pending'
+                    });
+                    alert('Collection arranged successfully!');
+                    document.getElementById('arrangeForm').reset();
+                    const arrangeModal = document.getElementById('arrangeModal');
+                    const modalInstance = bootstrap.Modal.getInstance(arrangeModal);
+                    modalInstance.hide();
+                } catch (error) {
+                    console.error('Error arranging collection: ', error);
+                }
+            } else {
+                alert('User not authenticated. Please log in.');
+            }
+        });
+
+        // Handle Points Redemption
+        document.getElementById('redeemForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const rewardOption = document.getElementById('rewardOption').value;
+            const user = auth.currentUser;
+
+            if (user) {
+                try {
+                    await db.collection('rewards').add({
+                        userId: user.uid,
+                        rewardOption: rewardOption,
+                        redeemedAt: new Date()
+                    });
+                    alert('Reward redeemed successfully!');
+                    document.getElementById('redeemForm').reset();
+                    const redeemModal = document.getElementById('redeemModal');
+                    const modalInstance = bootstrap.Modal.getInstance(redeemModal);
+                    modalInstance.hide();
+                } catch (error) {
+                    console.error('Error redeeming reward: ', error);
+                }
+            } else {
+                alert('User not authenticated. Please log in.');
+            }
+        });
+    </script>
+</body>
+</html>

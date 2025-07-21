@@ -1,0 +1,46 @@
+/* styles.css */
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 15px; /* Rounded corners */
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+h1 {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.btn {
+    margin-top: 20px;
+}
+
+/* 3D Animation for Cards */
+.card {
+    perspective: 1000px;
+}
+
+.card-body {
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+}
+
+.card:hover .card-body {
+    transform: rotateY(10deg);
+}
+
+/* Additional Styles for Icons */
+.card-body i {
+    transition: color 0.3s;
+}
+
+.card-body:hover i {
+    color: #28a745; /* Change color on hover */
+}
